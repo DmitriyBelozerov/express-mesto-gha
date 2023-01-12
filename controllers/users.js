@@ -2,28 +2,35 @@ const User = require('../models/user');
 //ok
 const getUsers = (req, res) => {
   return User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch((err) => res.status(500).send(err))
+    .then((users) => {
+      if (!users) {
+        res.status(404).send({ message: "Запрашиваемые пользователи не найдены" })
+      } else {
+        res.status(200).send({ data: users })
+      }
+    })
+    .catch((err) => res.status(500).send({ message: `Ошибка сервера: ${err}` }))
 }
 //ok
 const getUsersById = (req, res) => {
-  return User.findById(req.user._id)
+  User.findById(req.user._id)
     .then((user) => {
-      if (user) {
-        return res.status(200).send({ data: user });
+      if (!user) {
+        res.status(404).send({ message: "Запрашиваемый пользователь не найден" })
+      } else {
+        res.status(200).send({ data: user });
       }
-      return res.status(404).send({ message: "User not found" })
     })
-    .catch((err) => res.status(500).send(err))
+    .catch((err) => res.status(500).send({ message: `Ошибка сервера: ${err}` }))
 }
 //ok
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
-      return res.status(200).send(user);
+      res.status(200).send({ data: user });
     })
-    .catch((err) => res.status(500).send(err))
+    .catch((err) => res.status(500).send({ message: `Ошибка сервера: ${err}` }))
 }
 
 //ok
@@ -31,18 +38,26 @@ const updateUser = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true, })
     .then((user) => {
-      return res.status(200).send(user);
+      if (!user) {
+        res.status(404).send({ message: "Запрашиваемый пользователь не найден" })
+      } else {
+        res.status(200).send({ data: user });
+
+      }
     })
-    .catch((err) => res.status(500).send(err))
+    .catch((err) => res.status(500).send({ message: `Ошибка сервера: ${err}` }))
 }
 //ok
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true, })
     .then((user) => {
-      return res.status(200).send(user);
+      if (!user) {
+        res.status(404).send({ message: "Запрашиваемый пользователь не найден" })
+      }
+      res.status(200).send({ data: user });
     })
-    .catch((err) => res.status(500).send(err))
+    .catch((err) => res.status(500).send({ message: `Ошибка сервера: ${err}` }))
 }
 
 
