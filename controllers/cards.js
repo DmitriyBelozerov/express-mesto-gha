@@ -60,7 +60,13 @@ const likeCard = (req, res) => {
         res.status(NO_ERRORS).send({ data: card })
       }
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
+    .catch((err) => {
+      if (err.name == "CastError") {
+        res.status(ERROR_VALIDATION).send({ message: `Переданы некорректные данные при создании лайка карточки` })
+      } else {
+        res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` })
+      }
+    })
 }
 
 const deletelikeCard = (req, res) => {
@@ -72,7 +78,13 @@ const deletelikeCard = (req, res) => {
         res.status(NO_ERRORS).send({ data: card })
       }
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
+    .catch((err) => {
+      if (err.name == "CastError") {
+        res.status(ERROR_VALIDATION).send({ message: `Переданы некорректные данные при удалении лайка карточки` })
+      } else {
+        res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` })
+      }
+    });
 }
 
 module.exports = { createCard, getCards, deleteCard, likeCard, deletelikeCard };
