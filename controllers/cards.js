@@ -2,9 +2,8 @@ const Card = require('../models/card');
 const NO_ERRORS = 200;
 const ERROR_SERVER = 500;
 const ERROR_NO_FOUND = 404;
+const ERROR_VALIDATION = 400;
 
-
-//ok
 const getCards = (req, res) => {
   Card.find({})
     // .populate('owner')
@@ -19,7 +18,6 @@ const getCards = (req, res) => {
     .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
 }
 
-//ok
 const createCard = (req, res) => {
   const { name, link } = req.body;
   console.log({ name, link, owner: req.user._id });
@@ -27,9 +25,15 @@ const createCard = (req, res) => {
     .then((card) => {
       res.status(NO_ERRORS).send({ data: card });
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
+    .catch((err) => {
+      if (err.name == "ValidationError") {
+        res.status(ERROR_VALIDATION).send({ message: `Переданы некорректные данные при создании карточки` })
+      } else {
+        res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` })
+      }
+    })
 }
-//ok
+
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
@@ -38,28 +42,32 @@ const deleteCard = (req, res) => {
       }
       res.status(NO_ERRORS).send({ data: card })
     })
-
-
-    .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
+    .catch((err) => {
+      if (err.name == "CastError") {
+        res.status(ERROR_VALIDATION).send({ message: `Переданы некорректные данные при удалении карточки` })
+      } else {
+        res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` })
+      }
+    })
 }
-//ok
+
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NO_FOUND).send({ message: 'Карточка не найдена' })
+        res.status(ERROR_VALIDATION).send({ message: `Карточка c данным ID: ${req.params.cardId} не найдена` })
       } else {
         res.status(NO_ERRORS).send({ data: card })
       }
     })
     .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
 }
-//ok
+
 const deletelikeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NO_FOUND).send({ message: 'Карточка не найдена' })
+        res.status(ERROR_VALIDATION).send({ message: `Карточка c данным ID: ${req.params.cardId} не найдена` })
       } else {
         res.status(NO_ERRORS).send({ data: card })
       }
