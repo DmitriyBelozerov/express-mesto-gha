@@ -15,9 +15,9 @@ const getUsers = (req, res) => {
     })
     .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
 }
-//ok
+
 const getUsersById = (req, res) => {
-  User.findById(req.user._id)
+  User.findById(req.user.userId)
     .then((user) => {
       if (!user) {
         res.status(ERROR_NO_FOUND).send({ message: "Запрашиваемый пользователь не найден" })
@@ -27,7 +27,7 @@ const getUsersById = (req, res) => {
     })
     .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
 }
-//ok
+
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
