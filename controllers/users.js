@@ -16,8 +16,8 @@ const getUsers = (req, res) => {
     .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
 }
 
-const getUsersById = (req, res) => {
-  User.findById(req.user.userId)
+const getUserById = (req, res) => {
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         res.status(ERROR_NO_FOUND).send({ message: "Запрашиваемый пользователь не найден" })
@@ -25,7 +25,13 @@ const getUsersById = (req, res) => {
         res.status(NO_ERRORS).send({ data: user });
       }
     })
-    .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }))
+    .catch((err) => {
+      if (err.name == "CastError") {
+        res.status(ERROR_VALIDATION).send({ message: `Переданы некорректные данные при запросе пользователя` })
+      } else {
+        res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` })
+      }
+    })
 }
 
 const createUser = (req, res) => {
@@ -80,4 +86,4 @@ const updateAvatar = (req, res) => {
 
 
 
-module.exports = { getUsers, getUsersById, createUser, updateUser, updateAvatar };
+module.exports = { getUsers, getUserById, createUser, updateUser, updateAvatar };
