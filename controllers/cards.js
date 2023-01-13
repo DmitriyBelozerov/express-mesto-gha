@@ -55,7 +55,7 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        res.status(ERROR_VALIDATION).send({ message: `Карточка c данным ID: ${req.params.cardId} не найдена` })
+        res.status(ERROR_NO_FOUND).send({ message: `Карточка c данным ID: ${req.params.cardId} не найдена` })
       } else {
         res.status(NO_ERRORS).send({ data: card })
       }
@@ -73,7 +73,7 @@ const deletelikeCard = (req, res) => {
   Card.findByIdAndUpdate(req.params.cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((card) => {
       if (!card) {
-        res.status(ERROR_VALIDATION).send({ message: `Карточка c данным ID: ${req.params.cardId} не найдена` })
+        res.status(ERROR_NO_FOUND).send({ message: `Карточка c данным ID: ${req.params.cardId} не найдена` })
       } else {
         res.status(NO_ERRORS).send({ data: card })
       }
