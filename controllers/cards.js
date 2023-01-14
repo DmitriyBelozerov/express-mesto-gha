@@ -7,17 +7,14 @@ const ERROR_VALIDATION = 400;
 
 const getCards = (req, res) => {
   Card.find({})
-    .orFail(new Error('CardError'))
     .then((cards) => {
-      res.status(NO_ERRORS).send({ data: cards });
-    })
-    .catch((err) => {
-      if (err.message === 'CardError') {
+      if (!cards) {
         res.status(ERROR_NO_FOUND).send({ message: 'Карточки не найдены' });
       } else {
-        res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` });
+        res.status(NO_ERRORS).send({ data: cards });
       }
-    });
+    })
+    .catch((err) => res.status(ERROR_SERVER).send({ message: `На сервере произошла ошибка: ${err}` }));
 };
 
 const createCard = (req, res) => {
