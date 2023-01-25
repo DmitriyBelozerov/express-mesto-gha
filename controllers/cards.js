@@ -37,8 +37,11 @@ const deleteCard = (req, res) => {
     .then((card) => {
       if (!card) {
         res.status(ERROR_NO_FOUND).send({ message: 'Карточка не найдена' });
+      } else if (card._id === req.user._id) {
+        res.status(ERROR_VALIDATION).send({ message: 'Нельзя удалять карточки других пользователей' });
+      } else {
+        res.status(NO_ERRORS).send({ data: card });
       }
-      res.status(NO_ERRORS).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
