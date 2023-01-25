@@ -6,9 +6,13 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const { celebrate, Joi, errors } = require('celebrate');
+
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
+
+// const NotFoundError = require('./errors/not-found-err');
 
 const { PORT = 3000 } = process.env;
 
@@ -28,10 +32,21 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/users', usersRouter);
-app.use(auth);
+// app.use(auth);
 app.use('/cards', cardsRouter);
-app.use('/404', (req, res) => {
-  res.status(404).send({ message: 'Страница не найдена' });
+// app.use('*', (req, res, next) => {
+//   try {
+//     throw new NotFoundError('Страница не найдена')
+//   } catch (next)
+// });
+app.use(errors());
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  res.status(statusCode).send({
+    message: statusCode === 500
+      ? `На сервере произошла ошибка ${err}`
+      : message,
+  });
 });
 
 app.listen(PORT, () => {
