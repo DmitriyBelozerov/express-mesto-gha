@@ -58,7 +58,7 @@ const getСurrentUser = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(new Error('ValidError'))
+    // .orFail(new Error('ValidError'))
     .then((user) => {
       res.status(NO_ERRORS).send({ data: user });
     })
@@ -78,7 +78,7 @@ const createUser = (req, res, next) => {
     name, about, avatar, email,
   } = req.body;
   bcrypt.hash(req.body.password, 10)
-    .orFail(new Error())
+    // .orFail(new Error())
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
@@ -99,7 +99,7 @@ const createUser = (req, res, next) => {
 const updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .orFail(new Error())
+    // .orFail(new Error())
     .then((user) => {
       res.status(NO_ERRORS).send({ data: user });
     })

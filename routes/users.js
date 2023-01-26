@@ -3,15 +3,12 @@ const { celebrate, Joi } = require('celebrate');
 
 const auth = require('../middlewares/auth');
 
-const regEx = /(https?:\/\/)(w{3}\.)?([da-zA-Z-])\.([a-zA-Z]{2,6})(\/[\w\-._~:/?#[\]@!$&'()*+,;=]#?)?/;
+const regEx = /(https?:\/\/)(w{3}\.)?([a-zA-Z0-9-]{0,100}\.)([a-zA-Z]{2,6})(\/[\w\-._~:/?#[\]@!$&'()*+,;=]#?)?/;
 
 const {
   getUsers, getСurrentUser, getUserById, createUser, updateUser, updateAvatar, login,
 } = require('../controllers/users');
 
-router.get('/', auth, getUsers);
-router.get('/me', auth, getСurrentUser);
-router.get('/:userId', auth, getUserById);
 router.post(
   '/signin',
   celebrate({
@@ -37,6 +34,10 @@ router.post(
   createUser,
 );
 
+router.get('/', auth, getUsers);
+router.get('/me', auth, getСurrentUser);
+router.get('/:userId', auth, getUserById);
+
 router.patch(
   '/me',
   auth,
@@ -61,5 +62,3 @@ router.patch(
 );
 
 module.exports = router;
-
-// добавить защиту роутов
