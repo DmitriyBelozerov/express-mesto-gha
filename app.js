@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const { celebrate, Joi, errors } = require('celebrate');
+const { errors } = require('celebrate');
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
@@ -32,7 +32,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/users', usersRouter);
-// app.use(auth);
+app.use(auth);
 app.use('/cards', cardsRouter);
 // app.use('*', (req, res, next) => {
 //   try {
@@ -40,7 +40,7 @@ app.use('/cards', cardsRouter);
 //   } catch (next)
 // });
 app.use(errors());
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({
     message: statusCode === 500

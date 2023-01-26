@@ -1,15 +1,17 @@
 const router = require('express').Router();
-const { celebrate, Joi, errors } = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
 
 const auth = require('../middlewares/auth');
+
+const regEx = /(https?:\/\/)(w{3}\.)?([da-zA-Z-])\.([a-zA-Z]{2,6})(\/[\w\-._~:/?#[\]@!$&'()*+,;=]#?)?/;
 
 const {
   getUsers, getСurrentUser, getUserById, createUser, updateUser, updateAvatar, login,
 } = require('../controllers/users');
 
-router.get('/', getUsers);
-router.get('/me', getСurrentUser);
-router.get('/:userId', getUserById);
+router.get('/', auth, getUsers);
+router.get('/me', auth, getСurrentUser);
+router.get('/:userId', auth, getUserById);
 router.post(
   '/signin',
   celebrate({
@@ -27,7 +29,7 @@ router.post(
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
       about: Joi.string().required().min(2).max(30),
-      avatar: Joi.string().required(),
+      avatar: Joi.string().required().pattern(regEx),
       email: Joi.string().required().email(),
       password: Joi.string().required().min(2).max(50),
     }),
@@ -37,6 +39,7 @@ router.post(
 
 router.patch(
   '/me',
+  auth,
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
@@ -48,6 +51,7 @@ router.patch(
 
 router.patch(
   '/me/avatar',
+  auth,
   celebrate({
     body: Joi.object().keys({
       avatar: Joi.string().required(),
