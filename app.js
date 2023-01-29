@@ -1,6 +1,4 @@
 const express = require('express');
-
-const app = express();
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -8,9 +6,11 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const { errors, celebrate, Joi } = require('celebrate');
 
+const app = express();
+
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-// const auth = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 
 const NotFoundError = require('./errors/not-found-err');
 
@@ -19,7 +19,6 @@ const {
 } = require('./controllers/users');
 
 const regEx = /(https?:\/\/)(w{3}\.)?([a-zA-Z0-9-]{0,100}\.)([a-zA-Z]{2,6})(\/[\w\-._~:/?#[\]@!$&'()*+,;=]#?)?/;
-
 const { PORT = 3000 } = process.env;
 
 const limiter = rateLimit({
@@ -62,7 +61,7 @@ app.post(
   createUser,
 );
 
-// app.use(auth);
+app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
