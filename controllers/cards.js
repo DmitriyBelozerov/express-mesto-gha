@@ -36,7 +36,7 @@ const deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
-      } else if (!card._id === req.user._id) {
+      } else if (!card.owner === req.user._id) {
         throw new ValidationError('Нельзя удалять карточки других пользователей');
       } else {
         res.status(NO_ERRORS).send({ data: card });
