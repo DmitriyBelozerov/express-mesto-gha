@@ -38,7 +38,6 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-
 app.post(
   '/signin',
   celebrate({
