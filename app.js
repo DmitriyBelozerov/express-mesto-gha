@@ -36,7 +36,6 @@ app.use(helmet());
 app.use(limiter);
 app.use(cors());
 app.use(bodyParser.json());
-app.use(errors());
 
 app.post(
   '/signin',
@@ -69,15 +68,16 @@ app.use('/cards', cardsRouter);
 
 app.use('*', (req, res, next) => next(new NotFoundError('Страница не существует')));
 
-app.use((err, req, res, next ) => {
+app.use(errors());
+app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({
     message: statusCode === 500
       ? `На сервере произошла ошибка ${err}`
       : message,
   });
+  next();
 });
-app.use(errors());
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT} / Сервер запущен на "${PORT}" порте`);
