@@ -81,10 +81,15 @@ const createUser = (req, res, next) => {
     // .orFail(new Error())
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
-    }))
-    .then((user) => {
-      res.status(NO_ERRORS).send({ data: user });
     })
+      .then((user) => {
+        res.status(NO_ERRORS).send({
+          name: user.name,
+          about: user.about,
+          avatar: user.avatar,
+          email: user.email,
+        });
+      }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные при создании пользователя'));
