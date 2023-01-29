@@ -48,7 +48,7 @@ const getСurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Запрашиваемые пользователи не найдены '));
+        next(new NotFoundError('Текущий пользователь не найден'));
       } else {
         res.status(NO_ERRORS).send({ data: user });
       }
@@ -58,9 +58,12 @@ const getСurrentUser = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    // .orFail(new Error('ValidError'))
     .then((user) => {
-      res.status(NO_ERRORS).send({ data: user });
+      if (!user) {
+        throw new NotFoundError('Запрашиваемый пользователь не найден');
+      } else {
+        res.status(NO_ERRORS).send({ data: user });
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -103,9 +106,12 @@ const createUser = (req, res, next) => {
 const updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    // .orFail(new Error())
     .then((user) => {
-      res.status(NO_ERRORS).send({ data: user });
+      if (!user) {
+        throw new NotFoundError('Пользователь с указанным _id не найден');
+      } else {
+        res.status(NO_ERRORS).send({ data: user });
+      }
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

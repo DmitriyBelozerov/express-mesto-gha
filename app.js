@@ -10,7 +10,7 @@ const { errors, celebrate, Joi } = require('celebrate');
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
-const auth = require('./middlewares/auth');
+// const auth = require('./middlewares/auth');
 
 const NotFoundError = require('./errors/not-found-err');
 
