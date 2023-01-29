@@ -6,11 +6,18 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const { errors } = require('celebrate');
+const router = require('express').Router();
+const { errors, celebrate, Joi } = require('celebrate');
 
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
+
+const {
+  createUser, login,
+} = require('./controllers/users');
+
+const regEx = /(https?:\/\/)(w{3}\.)?([a-zA-Z0-9-]{0,100}\.)([a-zA-Z]{2,6})(\/[\w\-._~:/?#[\]@!$&'()*+,;=]#?)?/;
 
 const { PORT = 3000 } = process.env;
 
@@ -29,8 +36,33 @@ app.use(limiter);
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use('/users', usersRouter);
+router.post(
+  '/signin',
+  celebrate({
+    body: Joi.object().keys({
+      email: Joi.string().required().email(),
+      password: Joi.string().required().min(2).max(50),
+    }),
+  }),
+  login,
+);
+
+router.post(
+  '/signup',
+  celebrate({
+    body: Joi.object().keys({
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string().pattern(regEx),
+      email: Joi.string().required().email(),
+      password: Joi.string().required().min(2),
+    }),
+  }),
+  createUser,
+);
+
 app.use(auth);
+app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
 app.use(errors());
