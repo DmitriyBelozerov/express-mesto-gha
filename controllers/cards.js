@@ -32,14 +32,18 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
-      } else if (!card.owner === req.user._id) {
+      } else if (!card.owner.equals(req.user._id)) {
         throw new ValidationError('Нельзя удалять карточки других пользователей');
       } else {
-        res.status(NO_ERRORS).send({ data: card });
+        Card.findByIdAndRemove(req.params.cardId)
+          .then(() => {
+            res.status(NO_ERRORS).send({ data: card });
+          })
+          .catch((err) => next(err));
       }
     })
     .catch((err) => {
