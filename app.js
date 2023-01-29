@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const { errors, celebrate, Joi } = require('celebrate');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -35,6 +36,8 @@ app.use(helmet());
 app.use(limiter);
 app.use(cors());
 app.use(bodyParser.json());
+app.use(cookieParser());
+
 
 app.post(
   '/signin',
