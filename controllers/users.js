@@ -25,7 +25,7 @@ const login = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ValidationError('Неправильно набран логин или пароль'));
+        next(new ValidationError('Неправильный формат логина или пароля'));
       } else {
         next(err);
       }
