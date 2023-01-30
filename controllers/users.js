@@ -4,7 +4,7 @@ const User = require('../models/user');
 
 const NO_ERRORS = 200;
 const NotFoundError = require('../errors/not-found-err');
-const ValidationError = require('../errors/validation-err');
+const IncorrectError = require('../errors/access-err');
 const AuthError = require('../errors/auth-err');
 const UniqueEmailError = require('../errors/unique-email-err');
 
@@ -12,38 +12,24 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        throw new AuthError('Неправильные почта или пароль');
-      } else {
-        const token = jwt.sign(
-          { _id: user._id },
-          'secret-key',
-          { expiresIn: '7d' },
-        );
-        res.cookie(
-          'jwt',
-          token,
-          { maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: true },
-        ).send({ token });
-      }
+      const token = jwt.sign(
+        { _id: user._id },
+        'secret-key',
+        { expiresIn: '7d' },
+      );
+      res.cookie(
+        'jwt',
+        token,
+        { maxAge: 3600000 * 24 * 7, httpOnly: true, sameSite: true },
+      ).send({ token });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ValidationError('Неправильный формат логина или пароля'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
-      if (!users) {
-        next(new NotFoundError('Запрашиваемые пользователи не найдены '));
-      } else {
-        res.status(NO_ERRORS).send({ data: users });
-      }
+      res.status(NO_ERRORS).send({ data: users });
     })
     .catch(next);
 };
@@ -73,8 +59,6 @@ const getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данные при запросе пользователя'));
-      } else if (err.message === 'ValidError') {
-        next(new NotFoundError('Запрашиваемый пользователь не найден'));
       } else {
         next(err);
       }
@@ -119,10 +103,8 @@ const updateUser = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные при обновлении профиля пользователя'));
-      } else if (err.name === 'CastError') {
-        next(new NotFoundError('Пользователь с указанным _id не найден'));
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new IncorrectError('Переданы некорректные данные при обновлении профиля пользователя'));
       } else {
         next(err);
       }

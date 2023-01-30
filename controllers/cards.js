@@ -1,17 +1,13 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const ValidationError = require('../errors/validation-err');
+const ValidationError = require('../errors/access-err');
 
 const NO_ERRORS = 200;
 
 const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => {
-      if (!cards) {
-        throw new NotFoundError('Карточки не найдены');
-      } else {
-        res.status(NO_ERRORS).send({ data: cards });
-      }
+      res.status(NO_ERRORS).send({ data: cards });
     })
     .catch(next);
 };
