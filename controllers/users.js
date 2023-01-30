@@ -5,7 +5,6 @@ const User = require('../models/user');
 const NO_ERRORS = 200;
 const NotFoundError = require('../errors/not-found-err');
 const IncorrectError = require('../errors/access-err');
-const AuthError = require('../errors/auth-err');
 const UniqueEmailError = require('../errors/unique-email-err');
 
 const login = (req, res, next) => {
@@ -58,7 +57,7 @@ const getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные при запросе пользователя'));
+        next(new IncorrectError('Переданы некорректные данные при запросе пользователя'));
       } else {
         next(err);
       }
@@ -83,7 +82,7 @@ const createUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные при создании пользователя'));
+        next(new IncorrectError('Переданы некорректные данные при создании пользователя'));
       } else if (err.code === 11000) {
         next(new UniqueEmailError('Пользователь с таким Email уже существует'));
       } else {
@@ -122,7 +121,7 @@ const updateAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ValidationError('Переданы некорректные данные при обновлении аватара пользователя'));
+        next(new IncorrectError('Переданы некорректные данные при обновлении аватара пользователя'));
       } else {
         next(err);
       }
