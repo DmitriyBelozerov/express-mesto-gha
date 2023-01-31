@@ -1,6 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
-const ValidationError = require('../errors/access-err');
+const UserAccessError = require('../errors/user-access-err');
+const ValidationError = require('../errors/validation-err');
 
 const NO_ERRORS = 200;
 
@@ -33,7 +34,7 @@ const deleteCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка не найдена');
       } else if (!card.owner.equals(req.user._id)) {
-        throw new ValidationError('Нельзя удалять карточки других пользователей');
+        throw new UserAccessError('Нельзя удалять карточки других пользователей');
       } else {
         Card.findByIdAndRemove(req.params.cardId)
           .then(() => {
@@ -43,7 +44,7 @@ const deleteCard = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данные при удалении карточки'));
       } else {
         next(err);

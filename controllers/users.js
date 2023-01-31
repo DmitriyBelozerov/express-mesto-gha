@@ -4,8 +4,9 @@ const User = require('../models/user');
 
 const NO_ERRORS = 200;
 const NotFoundError = require('../errors/not-found-err');
-const IncorrectError = require('../errors/access-err');
+const UserAccessError = require('../errors/user-access-err');
 const UniqueEmailError = require('../errors/unique-email-err');
+const ValidationError = require('../errors/validation-err');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -56,8 +57,8 @@ const getUserById = (req, res, next) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new IncorrectError('Переданы некорректные данные при запросе пользователя'));
+      if (err.name === 'ValidationError') {
+        next(new ValidationError('Переданы некорректные данные при запросе пользователя'));
       } else {
         next(err);
       }
@@ -82,7 +83,7 @@ const createUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectError('Переданы некорректные данные при создании пользователя'));
+        next(new ValidationError('Переданы некорректные данные при создании пользователя'));
       } else if (err.code === 11000) {
         next(new UniqueEmailError('Пользователь с таким Email уже существует'));
       } else {
@@ -103,7 +104,7 @@ const updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new IncorrectError('Переданы некорректные данные при обновлении профиля пользователя'));
+        next(new UserAccessError('Переданы некорректные данные при обновлении профиля пользователя'));
       } else {
         next(err);
       }
@@ -120,8 +121,8 @@ const updateAvatar = (req, res, next) => {
       res.status(NO_ERRORS).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new IncorrectError('Переданы некорректные данные при обновлении аватара пользователя'));
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new ValidationError('Переданы некорректные данные при обновлении аватара пользователя'));
       } else {
         next(err);
       }

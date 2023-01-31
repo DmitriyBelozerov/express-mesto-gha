@@ -1,8 +1,8 @@
-class IncorrectError extends Error {
+class ValidationError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 400;
   }
 }
 
-module.exports = IncorrectError;
+module.exports = ValidationError;
