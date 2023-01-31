@@ -4,7 +4,6 @@ const User = require('../models/user');
 
 const NO_ERRORS = 200;
 const NotFoundError = require('../errors/not-found-err');
-const UserAccessError = require('../errors/user-access-err');
 const UniqueEmailError = require('../errors/unique-email-err');
 const ValidationError = require('../errors/validation-err');
 
@@ -104,7 +103,7 @@ const updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new UserAccessError('Переданы некорректные данные при обновлении профиля пользователя'));
+        next(new ValidationError('Переданы некорректные данные при обновлении профиля пользователя'));
       } else {
         next(err);
       }
